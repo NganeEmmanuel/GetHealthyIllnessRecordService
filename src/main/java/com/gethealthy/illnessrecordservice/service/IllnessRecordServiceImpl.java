@@ -30,7 +30,7 @@ public class IllnessRecordServiceImpl implements IllnessRecordService{
     public IllnessRecordDTO getIllnessRecord(Long id) throws RecordNotFoundException {
         try {
             return mapperService.toDTO(illnessRecordRepository.findById(id).orElseThrow(
-                    () -> new RecordNotFoundException("Illness record with id " + id + " not found")
+                    () -> new RecordNotFoundException(id)
             ));
         }catch(RecordNotFoundException recordNotFoundException){
             logger.info("No illness record in the database with ID: {}", id);
@@ -43,6 +43,48 @@ public class IllnessRecordServiceImpl implements IllnessRecordService{
 
     @Override
     public List<IllnessRecordDTO> getAllIllnessRecordsByUserId(Long userID) throws RecordNotFoundException {
-        return List.of(illnessRecordRepository.findAllByUserID(userID));
+        try {
+            return illnessRecordRepository.findAllByUserID(userID).orElseThrow(
+                    () -> new RecordNotFoundException(userID)
+            );
+        }catch(RecordNotFoundException recordNotFoundException){
+            logger.info("No illness record in the database associated with the userID: {}", userID);
+            throw new RuntimeException(recordNotFoundException);
+        }catch (Exception e){
+            logger.info("Error retrieving illness record associated with userID: {}", userID);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<IllnessRecordDTO> getRecordsBySearch(String term) throws RecordNotFoundException {
+        try {
+            return illnessRecordRepository.searchRecords(term).orElseThrow(
+                    () -> new RecordNotFoundException(term)
+            );
+        }catch(RecordNotFoundException recordNotFoundException){
+            logger.info("No illness record in the database matching: {}", term);
+            throw new RuntimeException(recordNotFoundException);
+        }catch (Exception e){
+            logger.info("Error retrieving illness record matching: {}", term);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public IllnessRecordDTO update(IllnessRecordDTO illnessRecordDTO) throws RecordNotFoundException {
+        try {
+            var illnessRecord = illnessRecordRepository.findById(illnessRecordDTO.getId()).orElseThrow(
+                    () -> new RecordNotFoundException(illnessRecordDTO.getId())
+            );
+            mapperService.updateEntity(illnessRecordDTO, illnessRecord);
+            return mapperService.toDTO(illnessRecordRepository.save(illnessRecord));
+        }catch (RecordNotFoundException recordNotFoundException){
+            logger.info("No illness records found with id: {}", illnessRecordDTO.getId());
+            throw new RuntimeException(recordNotFoundException);
+        }catch (Exception e){
+            logger.info("Error updating illness record with data: {}", illnessRecordDTO);
+            throw new RuntimeException(e);
+        }
     }
 }

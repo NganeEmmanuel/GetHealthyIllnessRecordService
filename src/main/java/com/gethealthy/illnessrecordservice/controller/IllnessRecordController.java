@@ -25,8 +25,24 @@ public class IllnessRecordController {
         return ResponseEntity.ok(illnessRecordService.getIllnessRecord(id));
     }
 
+    @GetMapping("get/records")
     public ResponseEntity<List<IllnessRecordDTO>> getAllIllnessRecordsByUserId(@RequestParam("userId") Long userId){
         return ResponseEntity.ok(illnessRecordService.getAllIllnessRecordsByUserId(userId));
     }
+
+    @GetMapping("search")
+    public ResponseEntity<List<IllnessRecordDTO>> getRecordsBySearch(@RequestParam("search") String search){
+        return ResponseEntity.ok(illnessRecordService.getRecordsBySearch(search));
+    }
+
+    @PutMapping("update")
+    public ResponseEntity<IllnessRecordDTO> updateIllnessRecord(@RequestBody IllnessRecordDTO illnessRecordDTO){
+        return ResponseEntity.ok(illnessRecordService.update(illnessRecordDTO));
+    }
+
+//    @DeleteMapping("delete")
+//    public ResponseEntity<String> deleteIllnessRecord(@RequestParam("id") Long id){
+//        return ResponseEntity.ok(illnessRecordService.deleteIllnessRecord(id));
+//    }
 
 }

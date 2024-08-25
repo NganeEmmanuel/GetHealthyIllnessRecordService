@@ -31,4 +31,22 @@ public interface IllnessRecordService {
      * @throws RecordNotFoundException if record is not found in the database
      */
    List<IllnessRecordDTO> getAllIllnessRecordsByUserId(Long userId) throws RecordNotFoundException;
+
+    /**
+     *Retrieves all Illness records that can match to the search term(contains)
+     *
+     * @param term data type of Long identifying the userId associated with records in the database
+     * @return a list of recordDTO object if found in the database
+     * @throws RecordNotFoundException if record is not found in the database
+     */
+    List<IllnessRecordDTO> getRecordsBySearch(String term) throws RecordNotFoundException;
+
+    /**
+     *Adds illness record to the database
+     *
+     * @param illnessRecordDTO DTO object to update existing records in the database
+     * @return IllnessDTO object with updated user information
+     * @throws RecordNotFoundException if record doesn't match any existing record
+     */
+    IllnessRecordDTO update(IllnessRecordDTO illnessRecordDTO) throws RecordNotFoundException;
 }
