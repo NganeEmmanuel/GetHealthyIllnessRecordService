@@ -1,9 +1,11 @@
 package com.gethealthy.illnessrecordservice.model;
 
 import com.gethealthy.illnessrecordservice.enums.IllnessStatus;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class IllnessRecordDTO {
     private Long id;
     private String illnessName;
