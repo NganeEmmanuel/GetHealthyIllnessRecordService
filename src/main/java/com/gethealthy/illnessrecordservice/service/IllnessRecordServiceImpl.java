@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -45,9 +46,13 @@ public class IllnessRecordServiceImpl implements IllnessRecordService{
     @Override
     public List<IllnessRecordDTO> getAllIllnessRecordsByUserId(Long userID) throws RecordNotFoundException {
         try {
-            return illnessRecordRepository.findAllByUserID(userID).orElseThrow(
+            var illnessDTOs = new ArrayList<IllnessRecordDTO>();
+            var ilnessRecords = illnessRecordRepository.findAllByUserID(userID).orElseThrow(
                     () -> new RecordNotFoundException(userID)
             );
+
+            ilnessRecords.forEach(record -> illnessDTOs.add(mapperService.toDTO(record)));
+            return illnessDTOs;
         }catch(RecordNotFoundException recordNotFoundException){
             logger.info("No illness record in the database associated with the userID: {}", userID);
             throw new RuntimeException(recordNotFoundException);
@@ -60,9 +65,14 @@ public class IllnessRecordServiceImpl implements IllnessRecordService{
     @Override
     public List<IllnessRecordDTO> getRecordsBySearch(String term) throws RecordNotFoundException {
         try {
-            return illnessRecordRepository.searchRecords(term).orElseThrow(
-                    () -> new RecordNotFoundException(term)
-            );
+            var illnessRecordDTOS = new ArrayList<IllnessRecordDTO>();
+            var illnesRecords = illnessRecordRepository.searchRecords(term)
+                    .orElseThrow(
+                        () -> new RecordNotFoundException(term)
+                    );
+            illnesRecords.forEach(record -> illnessRecordDTOS.add(mapperService.toDTO(record)));
+
+            return illnessRecordDTOS;
         }catch(RecordNotFoundException recordNotFoundException){
             logger.info("No illness record in the database matching: {}", term);
             throw new RuntimeException(recordNotFoundException);
