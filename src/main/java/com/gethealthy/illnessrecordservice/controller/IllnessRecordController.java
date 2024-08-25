@@ -1,6 +1,5 @@
 package com.gethealthy.illnessrecordservice.controller;
 
-import com.gethealthy.illnessrecordservice.model.IllnessRecord;
 import com.gethealthy.illnessrecordservice.model.IllnessRecordDTO;
 import com.gethealthy.illnessrecordservice.service.IllnessRecordService;
 import lombok.RequiredArgsConstructor;

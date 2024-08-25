@@ -13,6 +13,7 @@ public class IllnessRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private Long userID;
     private String illnessName;
     private String illnessStartDate;
     private String illnessEndDate;
