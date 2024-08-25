@@ -1,5 +1,6 @@
 package com.gethealthy.illnessrecordservice.controller;
 
+import com.gethealthy.illnessrecordservice.model.DeleteRequest;
 import com.gethealthy.illnessrecordservice.model.IllnessRecordDTO;
 import com.gethealthy.illnessrecordservice.service.IllnessRecordService;
 import lombok.RequiredArgsConstructor;
@@ -40,9 +41,9 @@ public class IllnessRecordController {
         return ResponseEntity.ok(illnessRecordService.update(illnessRecordDTO));
     }
 
-//    @DeleteMapping("delete")
-//    public ResponseEntity<String> deleteIllnessRecord(@RequestParam("id") Long id){
-//        return ResponseEntity.ok(illnessRecordService.deleteIllnessRecord(id));
-//    }
+    @DeleteMapping("delete")
+    public ResponseEntity<Boolean> deleteIllnessRecord(@RequestBody DeleteRequest deleteRequest){
+        return ResponseEntity.ok(illnessRecordService.deleteIllnessRecord(deleteRequest));
+    }
 
 }

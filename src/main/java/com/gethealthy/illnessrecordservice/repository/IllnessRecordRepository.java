@@ -27,4 +27,6 @@ public interface IllnessRecordRepository extends JpaRepository<IllnessRecord, Lo
             "   OR to_tsvector('english', description) @@ plainto_tsquery('english', :term) " +
             "ORDER BY dateAdded", nativeQuery = true)
     Optional<List<IllnessRecordDTO>> searchRecords(@Param("term") String term);
+
+    void deleteByIdAndUserID(Long id, Long userID);
 }

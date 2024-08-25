@@ -1,6 +1,7 @@
 package com.gethealthy.illnessrecordservice.service;
 
 import com.gethealthy.illnessrecordservice.exception.RecordNotFoundException;
+import com.gethealthy.illnessrecordservice.model.DeleteRequest;
 import com.gethealthy.illnessrecordservice.model.IllnessRecordDTO;
 
 import java.util.List;
@@ -49,4 +50,13 @@ public interface IllnessRecordService {
      * @throws RecordNotFoundException if record doesn't match any existing record
      */
     IllnessRecordDTO update(IllnessRecordDTO illnessRecordDTO) throws RecordNotFoundException;
+
+    /**
+     * Deletes the record associated with the id in the database
+     *
+     * @param deleteRequest Long data type that identify the illness record in the database
+     * @return true if successful and false if not
+     * @throws RecordNotFoundException if no record is found matching the recordID and userID
+     */
+    Boolean deleteIllnessRecord(DeleteRequest deleteRequest) throws RecordNotFoundException;
 }

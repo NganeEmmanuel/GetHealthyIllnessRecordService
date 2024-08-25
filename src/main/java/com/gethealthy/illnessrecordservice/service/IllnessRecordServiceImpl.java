@@ -1,6 +1,7 @@
 package com.gethealthy.illnessrecordservice.service;
 
 import com.gethealthy.illnessrecordservice.exception.RecordNotFoundException;
+import com.gethealthy.illnessrecordservice.model.DeleteRequest;
 import com.gethealthy.illnessrecordservice.model.IllnessRecordDTO;
 import com.gethealthy.illnessrecordservice.repository.IllnessRecordRepository;
 import lombok.RequiredArgsConstructor;
@@ -84,6 +85,20 @@ public class IllnessRecordServiceImpl implements IllnessRecordService{
             throw new RuntimeException(recordNotFoundException);
         }catch (Exception e){
             logger.info("Error updating illness record with data: {}", illnessRecordDTO);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Boolean deleteIllnessRecord(DeleteRequest deleteRequest) throws RecordNotFoundException {
+        try {
+            illnessRecordRepository.deleteByIdAndUserID(deleteRequest.getIllnessRecordID(), deleteRequest.getUserID());
+            return Boolean.TRUE;
+        }catch (RecordNotFoundException recordNotFoundException){
+            logger.info("No illness records found with id{} and userID{}", deleteRequest.getIllnessRecordID(), deleteRequest.getUserID());
+            throw new RuntimeException(recordNotFoundException);
+        }catch (Exception e){
+            logger.info("Error deleting illness record with data: {}", deleteRequest.getIllnessRecordID());
             throw new RuntimeException(e);
         }
     }
