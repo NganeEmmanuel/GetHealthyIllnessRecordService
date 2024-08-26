@@ -2,6 +2,7 @@ package com.gethealthy.illnessrecordservice.controller;
 
 import com.gethealthy.illnessrecordservice.model.DeleteRequest;
 import com.gethealthy.illnessrecordservice.model.IllnessRecordDTO;
+import com.gethealthy.illnessrecordservice.model.SearchRequest;
 import com.gethealthy.illnessrecordservice.service.IllnessRecordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -32,8 +33,8 @@ public class IllnessRecordController {
     }
 
     @GetMapping("search")
-    public ResponseEntity<List<IllnessRecordDTO>> getRecordsBySearch(@RequestParam("search") String search){
-        return ResponseEntity.ok(illnessRecordService.getRecordsBySearch(search));
+    public ResponseEntity<List<IllnessRecordDTO>> getRecordsBySearch(@RequestBody SearchRequest searchRequest){
+        return ResponseEntity.ok(illnessRecordService.getRecordsBySearch(searchRequest));
     }
 
     @PutMapping("update")

@@ -3,6 +3,7 @@ package com.gethealthy.illnessrecordservice.service;
 import com.gethealthy.illnessrecordservice.exception.RecordNotFoundException;
 import com.gethealthy.illnessrecordservice.model.DeleteRequest;
 import com.gethealthy.illnessrecordservice.model.IllnessRecordDTO;
+import com.gethealthy.illnessrecordservice.model.SearchRequest;
 import com.gethealthy.illnessrecordservice.repository.IllnessRecordRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -63,21 +64,21 @@ public class IllnessRecordServiceImpl implements IllnessRecordService{
     }
 
     @Override
-    public List<IllnessRecordDTO> getRecordsBySearch(String term) throws RecordNotFoundException {
+    public List<IllnessRecordDTO> getRecordsBySearch(SearchRequest searchRequest) throws RecordNotFoundException {
         try {
             var illnessRecordDTOS = new ArrayList<IllnessRecordDTO>();
-            var illnesRecords = illnessRecordRepository.searchRecords(term)
+            var illnesRecords = illnessRecordRepository.searchRecords(searchRequest.getTerm(), searchRequest.getUserID())
                     .orElseThrow(
-                        () -> new RecordNotFoundException(term)
+                        () -> new RecordNotFoundException(searchRequest.getTerm(), searchRequest.getUserID())
                     );
             illnesRecords.forEach(record -> illnessRecordDTOS.add(mapperService.toDTO(record)));
 
             return illnessRecordDTOS;
         }catch(RecordNotFoundException recordNotFoundException){
-            logger.info("No illness record in the database matching: {}", term);
+            logger.info("No illness record in the database matching: {} and userID: {}", searchRequest.getTerm(), searchRequest.getUserID());
             throw new RuntimeException(recordNotFoundException);
         }catch (Exception e){
-            logger.info("Error retrieving illness record matching: {}", term);
+            logger.info("Error retrieving illness record matching: {} and userID: {}", searchRequest.getTerm(), searchRequest.getUserID());
             throw new RuntimeException(e);
         }
     }

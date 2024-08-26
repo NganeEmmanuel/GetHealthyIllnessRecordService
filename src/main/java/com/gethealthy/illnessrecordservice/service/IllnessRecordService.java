@@ -3,6 +3,7 @@ package com.gethealthy.illnessrecordservice.service;
 import com.gethealthy.illnessrecordservice.exception.RecordNotFoundException;
 import com.gethealthy.illnessrecordservice.model.DeleteRequest;
 import com.gethealthy.illnessrecordservice.model.IllnessRecordDTO;
+import com.gethealthy.illnessrecordservice.model.SearchRequest;
 
 import java.util.List;
 
@@ -36,11 +37,11 @@ public interface IllnessRecordService {
     /**
      *Retrieves all Illness records that can match to the search term(contains)
      *
-     * @param term data type of Long identifying the userId associated with records in the database
+     * @param searchRequest objects containing the searchTerm and the userId
      * @return a list of recordDTO object if found in the database
      * @throws RecordNotFoundException if record is not found in the database
      */
-    List<IllnessRecordDTO> getRecordsBySearch(String term) throws RecordNotFoundException;
+    List<IllnessRecordDTO> getRecordsBySearch(SearchRequest searchRequest) throws RecordNotFoundException;
 
     /**
      *Adds illness record to the database
