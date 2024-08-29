@@ -1,8 +1,10 @@
 package com.gethealthy.illnessrecordservice.service;
 
 import com.gethealthy.illnessrecordservice.exception.RecordNotFoundException;
+import com.gethealthy.illnessrecordservice.feign.EventInterface;
 import com.gethealthy.illnessrecordservice.model.DeleteRequest;
 import com.gethealthy.illnessrecordservice.model.IllnessRecordDTO;
+import com.gethealthy.illnessrecordservice.model.RecordEventsDeleteRequest;
 import com.gethealthy.illnessrecordservice.model.SearchRequest;
 import com.gethealthy.illnessrecordservice.repository.IllnessRecordRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,8 @@ public class IllnessRecordServiceImpl implements IllnessRecordService{
     private final IllnessRecordRepository illnessRecordRepository;
     private final IllnessMapperService mapperService;
     private static final Logger logger = LoggerFactory.getLogger(IllnessRecordServiceImpl.class);
+    private final EventInterface eventInterface;
+
     @Override
     public IllnessRecordDTO addIllnessRecord(IllnessRecordDTO illnessRecordDTO) {
         try{
@@ -67,11 +71,11 @@ public class IllnessRecordServiceImpl implements IllnessRecordService{
     public List<IllnessRecordDTO> getRecordsBySearch(SearchRequest searchRequest) throws RecordNotFoundException {
         try {
             var illnessRecordDTOS = new ArrayList<IllnessRecordDTO>();
-            var illnesRecords = illnessRecordRepository.searchRecords(searchRequest.getTerm(), searchRequest.getUserID())
+            var illnessRecords = illnessRecordRepository.searchRecords(searchRequest.getTerm(), searchRequest.getUserID())
                     .orElseThrow(
                         () -> new RecordNotFoundException(searchRequest.getTerm(), searchRequest.getUserID())
                     );
-            illnesRecords.forEach(record -> illnessRecordDTOS.add(mapperService.toDTO(record)));
+            illnessRecords.forEach(record -> illnessRecordDTOS.add(mapperService.toDTO(record)));
 
             return illnessRecordDTOS;
         }catch(RecordNotFoundException recordNotFoundException){
@@ -104,6 +108,11 @@ public class IllnessRecordServiceImpl implements IllnessRecordService{
     public Boolean deleteIllnessRecord(DeleteRequest deleteRequest) throws RecordNotFoundException {
         try {
             illnessRecordRepository.deleteByIdAndUserID(deleteRequest.getIllnessRecordID(), deleteRequest.getUserID());
+            var recordEventsDeleteRequest = RecordEventsDeleteRequest.builder()
+                    .recordID(deleteRequest.getIllnessRecordID())
+                    .userID(deleteRequest.getUserID())
+                            .build();
+            eventInterface.deleteAllEventsByRecordID(recordEventsDeleteRequest);
             return Boolean.TRUE;
         }catch (RecordNotFoundException recordNotFoundException){
             logger.info("No illness records found with id{} and userID{}", deleteRequest.getIllnessRecordID(), deleteRequest.getUserID());

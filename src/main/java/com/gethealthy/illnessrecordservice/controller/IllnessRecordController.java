@@ -32,7 +32,7 @@ public class IllnessRecordController {
         return ResponseEntity.ok(illnessRecordService.getAllIllnessRecordsByUserId(userId));
     }
 
-    @GetMapping("search")
+    @PostMapping("search")
     public ResponseEntity<List<IllnessRecordDTO>> getRecordsBySearch(@RequestBody SearchRequest searchRequest){
         return ResponseEntity.ok(illnessRecordService.getRecordsBySearch(searchRequest));
     }

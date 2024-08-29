@@ -6,10 +6,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DeleteRequest {
-    private Long illnessRecordID;
+@Builder
+public class RecordEventsDeleteRequest {
+    private Long recordID;
     private Long userID;
 }
