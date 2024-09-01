@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
-@FeignClient
+@FeignClient("EVENT-SERVICE")
 public interface EventInterface {
-    @DeleteMapping("api/v1/event/delete/all/record")
+    @DeleteMapping("api/v1/events/record/delete-all")
     ResponseEntity<Boolean> deleteAllEventsByRecordID(@RequestBody RecordEventsDeleteRequest deleteRequest);
 }

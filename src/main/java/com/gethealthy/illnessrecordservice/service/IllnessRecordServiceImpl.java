@@ -1,16 +1,18 @@
 package com.gethealthy.illnessrecordservice.service;
 
 import com.gethealthy.illnessrecordservice.exception.RecordNotFoundException;
+import com.gethealthy.illnessrecordservice.feign.AuthenticationInterface;
 import com.gethealthy.illnessrecordservice.feign.EventInterface;
 import com.gethealthy.illnessrecordservice.model.DeleteRequest;
 import com.gethealthy.illnessrecordservice.model.IllnessRecordDTO;
 import com.gethealthy.illnessrecordservice.model.RecordEventsDeleteRequest;
-import com.gethealthy.illnessrecordservice.model.SearchRequest;
 import com.gethealthy.illnessrecordservice.repository.IllnessRecordRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,16 +24,24 @@ public class IllnessRecordServiceImpl implements IllnessRecordService{
     private final IllnessMapperService mapperService;
     private static final Logger logger = LoggerFactory.getLogger(IllnessRecordServiceImpl.class);
     private final EventInterface eventInterface;
+    private final AuthenticationInterface authenticationInterface;
 
     @Override
-    public IllnessRecordDTO addIllnessRecord(IllnessRecordDTO illnessRecordDTO) {
-        try{
-            return mapperService.toDTO(illnessRecordRepository.save(mapperService.toEntity(illnessRecordDTO)));
-        }catch(Exception e){
+    public IllnessRecordDTO addIllnessRecord(IllnessRecordDTO illnessRecordDTO, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
+        try {
+            var illnessRecord = mapperService.toEntity(illnessRecordDTO);
+
+            // Pass the Authorization header to Feign client to get the logged-in user ID
+            var response = authenticationInterface.getLoggedInUserId(authorizationHeader);
+            illnessRecord.setUserID(response.getBody());
+
+            return mapperService.toDTO(illnessRecordRepository.save(illnessRecord));
+        } catch (Exception e) {
             logger.info("Error adding illness record with data: {}", illnessRecordDTO);
             throw new RuntimeException(e);
         }
     }
+
 
     @Override
     public IllnessRecordDTO getIllnessRecord(Long id) throws RecordNotFoundException {
@@ -52,11 +62,11 @@ public class IllnessRecordServiceImpl implements IllnessRecordService{
     public List<IllnessRecordDTO> getAllIllnessRecordsByUserId(Long userID) throws RecordNotFoundException {
         try {
             var illnessDTOs = new ArrayList<IllnessRecordDTO>();
-            var ilnessRecords = illnessRecordRepository.findAllByUserID(userID).orElseThrow(
+            var illnessRecords = illnessRecordRepository.findAllByUserID(userID).orElseThrow(
                     () -> new RecordNotFoundException(userID)
             );
 
-            ilnessRecords.forEach(record -> illnessDTOs.add(mapperService.toDTO(record)));
+            illnessRecords.forEach(record -> illnessDTOs.add(mapperService.toDTO(record)));
             return illnessDTOs;
         }catch(RecordNotFoundException recordNotFoundException){
             logger.info("No illness record in the database associated with the userID: {}", userID);
@@ -68,21 +78,22 @@ public class IllnessRecordServiceImpl implements IllnessRecordService{
     }
 
     @Override
-    public List<IllnessRecordDTO> getRecordsBySearch(SearchRequest searchRequest) throws RecordNotFoundException {
+    public List<IllnessRecordDTO> getRecordsBySearch(String term, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) throws RecordNotFoundException {
         try {
+            var userID = authenticationInterface.getLoggedInUserId(authorizationHeader).getBody();
             var illnessRecordDTOS = new ArrayList<IllnessRecordDTO>();
-            var illnessRecords = illnessRecordRepository.searchRecords(searchRequest.getTerm(), searchRequest.getUserID())
+            var illnessRecords = illnessRecordRepository.searchRecords(term, userID)
                     .orElseThrow(
-                        () -> new RecordNotFoundException(searchRequest.getTerm(), searchRequest.getUserID())
+                        () -> new RecordNotFoundException(term, userID)
                     );
             illnessRecords.forEach(record -> illnessRecordDTOS.add(mapperService.toDTO(record)));
 
             return illnessRecordDTOS;
         }catch(RecordNotFoundException recordNotFoundException){
-            logger.info("No illness record in the database matching: {} and userID: {}", searchRequest.getTerm(), searchRequest.getUserID());
+            logger.info("No illness record in the database matching: {} and the current logged in user from authorizationHeader: {}",term, authorizationHeader);
             throw new RuntimeException(recordNotFoundException);
         }catch (Exception e){
-            logger.info("Error retrieving illness record matching: {} and userID: {}", searchRequest.getTerm(), searchRequest.getUserID());
+            logger.info("Error retrieving illness record matching: {} and the current logged in user from authorizationHeader: {}", term, authorizationHeader);
             throw new RuntimeException(e);
         }
     }
@@ -121,5 +132,11 @@ public class IllnessRecordServiceImpl implements IllnessRecordService{
             logger.info("Error deleting illness record with data: {}", deleteRequest.getIllnessRecordID());
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public List<IllnessRecordDTO> getAllIllnessRecordsByLoggedInUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) throws RecordNotFoundException {
+        var user = authenticationInterface.getLoggedInUserId(authorizationHeader);
+        return  getAllIllnessRecordsByUserId(user.getBody());
     }
 }

@@ -4,6 +4,8 @@ import com.gethealthy.illnessrecordservice.exception.RecordNotFoundException;
 import com.gethealthy.illnessrecordservice.model.DeleteRequest;
 import com.gethealthy.illnessrecordservice.model.IllnessRecordDTO;
 import com.gethealthy.illnessrecordservice.model.SearchRequest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.List;
 
@@ -14,7 +16,7 @@ public interface IllnessRecordService {
      * @param illnessRecordDTO DTO object to add to the database
      * @return IllnessDTO object that has been added to the database
      */
-    IllnessRecordDTO addIllnessRecord(IllnessRecordDTO illnessRecordDTO);
+    IllnessRecordDTO addIllnessRecord(IllnessRecordDTO illnessRecordDTO,  @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader);
 
     /**
      *Get a single record associated with a given ID
@@ -37,11 +39,11 @@ public interface IllnessRecordService {
     /**
      *Retrieves all Illness records that can match to the search term(contains)
      *
-     * @param searchRequest objects containing the searchTerm and the userId
+     * @param term the search term to search by
      * @return a list of recordDTO object if found in the database
      * @throws RecordNotFoundException if record is not found in the database
      */
-    List<IllnessRecordDTO> getRecordsBySearch(SearchRequest searchRequest) throws RecordNotFoundException;
+    List<IllnessRecordDTO> getRecordsBySearch(String term, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) throws RecordNotFoundException;
 
     /**
      *Adds illness record to the database
@@ -60,4 +62,13 @@ public interface IllnessRecordService {
      * @throws RecordNotFoundException if no record is found matching the recordID and userID
      */
     Boolean deleteIllnessRecord(DeleteRequest deleteRequest) throws RecordNotFoundException;
+
+    /**
+     *Retrieves all Illness records that are associated with a logged-in user
+     *
+     * @param authorizationHeader the header of the request
+     * @return a list of recordDTO object if found in the database matching the logged-in user
+     * @throws RecordNotFoundException if record is not found in the database
+     */
+    List<IllnessRecordDTO> getAllIllnessRecordsByLoggedInUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) throws RecordNotFoundException;
 }
