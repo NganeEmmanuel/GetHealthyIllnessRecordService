@@ -1,8 +1,6 @@
 package com.gethealthy.illnessrecordservice.controller;
 
-import com.gethealthy.illnessrecordservice.model.DeleteRequest;
 import com.gethealthy.illnessrecordservice.model.IllnessRecordDTO;
-import com.gethealthy.illnessrecordservice.model.SearchRequest;
 import com.gethealthy.illnessrecordservice.service.IllnessRecordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -46,13 +44,13 @@ public class IllnessRecordController {
     }
 
     @PutMapping("/illness/update")
-    public ResponseEntity<IllnessRecordDTO> updateIllnessRecord(@RequestBody IllnessRecordDTO illnessRecordDTO){
-        return ResponseEntity.ok(illnessRecordService.update(illnessRecordDTO));
+    public ResponseEntity<IllnessRecordDTO> updateIllnessRecord(@RequestBody IllnessRecordDTO illnessRecordDTO, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader){
+        return ResponseEntity.ok(illnessRecordService.update(illnessRecordDTO, authorizationHeader));
     }
 
     @DeleteMapping("/illness/delete")
-    public ResponseEntity<Boolean> deleteIllnessRecord(@RequestBody DeleteRequest deleteRequest){
-        return ResponseEntity.ok(illnessRecordService.deleteIllnessRecord(deleteRequest));
+    public ResponseEntity<Boolean> deleteIllnessRecord(@RequestParam Long id, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader){
+        return ResponseEntity.ok(illnessRecordService.deleteIllnessRecord(id, authorizationHeader));
     }
 
 }

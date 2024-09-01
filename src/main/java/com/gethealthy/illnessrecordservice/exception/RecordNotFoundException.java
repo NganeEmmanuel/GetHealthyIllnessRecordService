@@ -12,4 +12,8 @@ public class RecordNotFoundException extends RuntimeException {
     public RecordNotFoundException(String keyword, Long id) {
         super("No record found matching the term{" + keyword + "} and userID: {" + id + "}");
     }
+
+    public RecordNotFoundException(Long id, Long userID) {
+        super("No record found matching with id{" + id + "} and userID: " + userID);
+    }
 }

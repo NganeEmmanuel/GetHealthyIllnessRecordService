@@ -3,7 +3,6 @@ package com.gethealthy.illnessrecordservice.service;
 import com.gethealthy.illnessrecordservice.exception.RecordNotFoundException;
 import com.gethealthy.illnessrecordservice.feign.AuthenticationInterface;
 import com.gethealthy.illnessrecordservice.feign.EventInterface;
-import com.gethealthy.illnessrecordservice.model.DeleteRequest;
 import com.gethealthy.illnessrecordservice.model.IllnessRecordDTO;
 import com.gethealthy.illnessrecordservice.model.RecordEventsDeleteRequest;
 import com.gethealthy.illnessrecordservice.repository.IllnessRecordRepository;
@@ -80,12 +79,16 @@ public class IllnessRecordServiceImpl implements IllnessRecordService{
     @Override
     public List<IllnessRecordDTO> getRecordsBySearch(String term, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) throws RecordNotFoundException {
         try {
+            //get userID from header request
             var userID = authenticationInterface.getLoggedInUserId(authorizationHeader).getBody();
             var illnessRecordDTOS = new ArrayList<IllnessRecordDTO>();
+
+            //check if the record matching the recordId is associated with the logged i userID
             var illnessRecords = illnessRecordRepository.searchRecords(term, userID)
                     .orElseThrow(
                         () -> new RecordNotFoundException(term, userID)
                     );
+
             illnessRecords.forEach(record -> illnessRecordDTOS.add(mapperService.toDTO(record)));
 
             return illnessRecordDTOS;
@@ -99,15 +102,16 @@ public class IllnessRecordServiceImpl implements IllnessRecordService{
     }
 
     @Override
-    public IllnessRecordDTO update(IllnessRecordDTO illnessRecordDTO) throws RecordNotFoundException {
+    public IllnessRecordDTO update(IllnessRecordDTO illnessRecordDTO, String authorizationHeader) throws RecordNotFoundException {
         try {
-            var illnessRecord = illnessRecordRepository.findById(illnessRecordDTO.getId()).orElseThrow(
-                    () -> new RecordNotFoundException(illnessRecordDTO.getId())
+            var userID = authenticationInterface.getLoggedInUserId(authorizationHeader).getBody();
+            var illnessRecord = illnessRecordRepository.findByIdAndUserID(illnessRecordDTO.getId(), userID).orElseThrow(
+                    () -> new RecordNotFoundException(illnessRecordDTO.getId(), userID)
             );
             mapperService.updateEntity(illnessRecordDTO, illnessRecord);
             return mapperService.toDTO(illnessRecordRepository.save(illnessRecord));
         }catch (RecordNotFoundException recordNotFoundException){
-            logger.info("No illness records found with id: {}", illnessRecordDTO.getId());
+            logger.info("No illness records found with id: {} and associated with logged-in user from header: {}", illnessRecordDTO.getId(), authorizationHeader);
             throw new RuntimeException(recordNotFoundException);
         }catch (Exception e){
             logger.info("Error updating illness record with data: {}", illnessRecordDTO);
@@ -116,20 +120,21 @@ public class IllnessRecordServiceImpl implements IllnessRecordService{
     }
 
     @Override
-    public Boolean deleteIllnessRecord(DeleteRequest deleteRequest) throws RecordNotFoundException {
+    public Boolean deleteIllnessRecord(Long id, String authorizationHeader) throws RecordNotFoundException {
         try {
-            illnessRecordRepository.deleteByIdAndUserID(deleteRequest.getIllnessRecordID(), deleteRequest.getUserID());
+            var userID = authenticationInterface.getLoggedInUserId(authorizationHeader).getBody();
+            illnessRecordRepository.deleteByIdAndUserID(id, userID);
             var recordEventsDeleteRequest = RecordEventsDeleteRequest.builder()
-                    .recordID(deleteRequest.getIllnessRecordID())
-                    .userID(deleteRequest.getUserID())
+                    .recordID(id)
+                    .userID(userID)
                             .build();
             eventInterface.deleteAllEventsByRecordID(recordEventsDeleteRequest);
             return Boolean.TRUE;
         }catch (RecordNotFoundException recordNotFoundException){
-            logger.info("No illness records found with id{} and userID{}", deleteRequest.getIllnessRecordID(), deleteRequest.getUserID());
+            logger.info("No illness records found with id{} and associated with logged in user fom header{}", id, authorizationHeader);
             throw new RuntimeException(recordNotFoundException);
         }catch (Exception e){
-            logger.info("Error deleting illness record with data: {}", deleteRequest.getIllnessRecordID());
+            logger.info("Error deleting illness record with id: {} and associated with logged in user fom header{}", id, authorizationHeader);
             throw new RuntimeException(e);
         }
     }

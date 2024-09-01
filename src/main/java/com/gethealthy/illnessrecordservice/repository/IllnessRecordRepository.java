@@ -32,8 +32,8 @@ public interface IllnessRecordRepository extends JpaRepository<IllnessRecord, Lo
             "ORDER BY illness_start_date", nativeQuery = true)
     Optional<List<IllnessRecord>> searchRecords(@Param("term") String term, @Param("userID") Long userID);
 
-
-
-
+    @Query(value = "DELETE FROM illness_record WHERE id = :id AND userid = :userID", nativeQuery = true)
     void deleteByIdAndUserID(Long id, Long userID);
+
+    Optional<IllnessRecord> findByIdAndUserID(@Param("id")Long id, @Param("userID") Long userID);
 }

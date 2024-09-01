@@ -1,9 +1,7 @@
 package com.gethealthy.illnessrecordservice.service;
 
 import com.gethealthy.illnessrecordservice.exception.RecordNotFoundException;
-import com.gethealthy.illnessrecordservice.model.DeleteRequest;
 import com.gethealthy.illnessrecordservice.model.IllnessRecordDTO;
-import com.gethealthy.illnessrecordservice.model.SearchRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.RequestHeader;
 
@@ -40,28 +38,31 @@ public interface IllnessRecordService {
      *Retrieves all Illness records that can match to the search term(contains)
      *
      * @param term the search term to search by
+     * @param authorizationHeader the header for the request
      * @return a list of recordDTO object if found in the database
      * @throws RecordNotFoundException if record is not found in the database
      */
     List<IllnessRecordDTO> getRecordsBySearch(String term, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) throws RecordNotFoundException;
 
     /**
-     *Adds illness record to the database
+     *updates illness record found in the database associated with the logged-in user
      *
      * @param illnessRecordDTO DTO object to update existing records in the database
+     * @param authorizationHeader the header of the request
      * @return IllnessDTO object with updated user information
      * @throws RecordNotFoundException if record doesn't match any existing record
      */
-    IllnessRecordDTO update(IllnessRecordDTO illnessRecordDTO) throws RecordNotFoundException;
+    IllnessRecordDTO update(IllnessRecordDTO illnessRecordDTO, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) throws RecordNotFoundException;
 
     /**
-     * Deletes the record associated with the id in the database
+     * Deletes the record associated with the id in the database and logged-in user
      *
-     * @param deleteRequest Long data type that identify the illness record in the database
+     * @param id Long data type that identify the illness record in the database
+     * @param authorizationHeader the header of the request
      * @return true if successful and false if not
      * @throws RecordNotFoundException if no record is found matching the recordID and userID
      */
-    Boolean deleteIllnessRecord(DeleteRequest deleteRequest) throws RecordNotFoundException;
+    Boolean deleteIllnessRecord(Long id, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) throws RecordNotFoundException;
 
     /**
      *Retrieves all Illness records that are associated with a logged-in user

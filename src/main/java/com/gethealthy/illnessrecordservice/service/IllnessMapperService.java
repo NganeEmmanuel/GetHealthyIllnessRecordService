@@ -35,9 +35,10 @@ public class IllnessMapperService implements MapperService<IllnessRecordDTO, Ill
     @Override
     public void updateEntity(IllnessRecordDTO illnessRecordDTO, IllnessRecord illnessRecord) {
         illnessRecord.setIllnessName(illnessRecordDTO.getIllnessName());
-        illnessRecord.setIllnessDescription(illnessRecord.getIllnessDescription());
-        illnessRecord.setIllnessStatus(illnessRecord.getIllnessStatus());
-        illnessRecord.setIllnessLocation(illnessRecord.getIllnessLocation());
-        illnessRecord.setIllnessStartDate(illnessRecord.getIllnessStartDate());
+        illnessRecord.setIllnessDescription(illnessRecordDTO.getIllnessDescription());
+        illnessRecord.setIllnessStatus(illnessRecordDTO.getIllnessStatus());
+        illnessRecord.setIllnessLocation(illnessRecordDTO.getIllnessLocation());
+        illnessRecord.setIllnessStartDate(illnessRecordDTO.getIllnessStartDate());
+        illnessRecord.setIllnessEndDate(illnessRecordDTO.getIllnessEndDate());
     }
 }
