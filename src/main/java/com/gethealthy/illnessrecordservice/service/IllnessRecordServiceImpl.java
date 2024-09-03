@@ -94,7 +94,7 @@ public class IllnessRecordServiceImpl implements IllnessRecordService{
             return illnessRecordDTOS;
         }catch(RecordNotFoundException recordNotFoundException){
             logger.info("No illness record in the database matching: {} and the current logged in user from authorizationHeader: {}",term, authorizationHeader);
-            throw new RuntimeException(recordNotFoundException);
+            return new ArrayList<>(); //todo update all implementations to use ResponseEntity in service rather than in controller classes
         }catch (Exception e){
             logger.info("Error retrieving illness record matching: {} and the current logged in user from authorizationHeader: {}", term, authorizationHeader);
             throw new RuntimeException(e);

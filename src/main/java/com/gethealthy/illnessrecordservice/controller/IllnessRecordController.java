@@ -39,7 +39,7 @@ public class IllnessRecordController {
     }
 
     @PostMapping("/search")
-    public ResponseEntity<List<IllnessRecordDTO>> getRecordsBySearch(@RequestParam String term, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader){
+    public ResponseEntity<List<IllnessRecordDTO>> SearchRecords(@RequestParam String term, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader){
         return ResponseEntity.ok(illnessRecordService.getRecordsBySearch(term, authorizationHeader));
     }
 
