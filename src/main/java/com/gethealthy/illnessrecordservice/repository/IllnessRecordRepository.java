@@ -24,13 +24,14 @@ public interface IllnessRecordRepository extends JpaRepository<IllnessRecord, Lo
      * @return a list of the best possible matched records if available
      */
     @Query(value = "SELECT * FROM illness_record " +
-            "WHERE (to_tsvector('english', illness_name) @@ to_tsquery('english', :term || ':*') " +
-            "   OR to_tsvector('english', illness_description) @@ to_tsquery('english', :term || ':*') " +
+            "WHERE (to_tsvector('english', illness_name) @@ to_tsquery('english', regexp_replace(:term, '\\s+', ' & ', 'g') || ':*') " +
+            "   OR to_tsvector('english', illness_description) @@ to_tsquery('english', regexp_replace(:term, '\\s+', ' & ', 'g') || ':*') " +
             "   OR illness_name ILIKE '%' || :term || '%' " +
             "   OR illness_description ILIKE '%' || :term || '%') " +
             "AND userid = :userID " +
             "ORDER BY illness_start_date", nativeQuery = true)
     Optional<List<IllnessRecord>> searchRecords(@Param("term") String term, @Param("userID") Long userID);
+
 
     @Query(value = "DELETE FROM illness_record WHERE id = :id AND userid = :userID", nativeQuery = true)
     void deleteByIdAndUserID(Long id, Long userID);
