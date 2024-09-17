@@ -7,12 +7,15 @@ import com.gethealthy.illnessrecordservice.model.IllnessRecordDTO;
 import com.gethealthy.illnessrecordservice.model.RecordEventsDeleteRequest;
 import com.gethealthy.illnessrecordservice.repository.IllnessRecordRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.exception.GenericJDBCException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestHeader;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -119,21 +122,18 @@ public class IllnessRecordServiceImpl implements IllnessRecordService{
         }
     }
 
+    @Transactional
     @Override
     public Boolean deleteIllnessRecord(Long id, String authorizationHeader) throws RecordNotFoundException {
         try {
             var userID = authenticationInterface.getLoggedInUserId(authorizationHeader).getBody();
             illnessRecordRepository.deleteByIdAndUserID(id, userID);
-            var recordEventsDeleteRequest = RecordEventsDeleteRequest.builder()
-                    .recordID(id)
-                    .userID(userID)
-                            .build();
-            eventInterface.deleteAllEventsByRecordID(recordEventsDeleteRequest);
+            eventInterface.deleteAllEventsByRecordID(id, authorizationHeader);
             return Boolean.TRUE;
-        }catch (RecordNotFoundException recordNotFoundException){
+        } catch (RecordNotFoundException recordNotFoundException) {
             logger.info("No illness records found with id{} and associated with logged in user fom header{}", id, authorizationHeader);
             throw new RuntimeException(recordNotFoundException);
-        }catch (Exception e){
+        } catch (Exception e){
             logger.info("Error deleting illness record with id: {} and associated with logged in user fom header{}", id, authorizationHeader);
             throw new RuntimeException(e);
         }

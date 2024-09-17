@@ -2,6 +2,7 @@ package com.gethealthy.illnessrecordservice.repository;
 
 import com.gethealthy.illnessrecordservice.model.IllnessRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -33,8 +34,10 @@ public interface IllnessRecordRepository extends JpaRepository<IllnessRecord, Lo
     Optional<List<IllnessRecord>> searchRecords(@Param("term") String term, @Param("userID") Long userID);
 
 
-    @Query(value = "DELETE FROM illness_record WHERE id = :id AND userid = :userID", nativeQuery = true)
-    void deleteByIdAndUserID(Long id, Long userID);
+    @Modifying
+    @Query("DELETE FROM IllnessRecord ir WHERE ir.id = :id AND ir.userID = :userID")
+    void deleteByIdAndUserID(@Param("id") Long id, @Param("userID") Long userID);
+
 
     Optional<IllnessRecord> findByIdAndUserID(@Param("id")Long id, @Param("userID") Long userID);
 }
