@@ -23,7 +23,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(RecordNotFoundException.class)
     public ResponseEntity<String> handleUserNotFoundException(RecordNotFoundException ex, WebRequest request) {
-        logger.error("user not found: {}", ex.getMessage());
+        logger.error("illness record not found: {}", ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 

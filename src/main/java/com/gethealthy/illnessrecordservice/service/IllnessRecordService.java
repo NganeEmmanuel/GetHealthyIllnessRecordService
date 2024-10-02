@@ -3,6 +3,7 @@ package com.gethealthy.illnessrecordservice.service;
 import com.gethealthy.illnessrecordservice.exception.RecordNotFoundException;
 import com.gethealthy.illnessrecordservice.model.IllnessRecordDTO;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.List;
@@ -14,7 +15,7 @@ public interface IllnessRecordService {
      * @param illnessRecordDTO DTO object to add to the database
      * @return IllnessDTO object that has been added to the database
      */
-    IllnessRecordDTO addIllnessRecord(IllnessRecordDTO illnessRecordDTO,  @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader);
+    ResponseEntity<IllnessRecordDTO> addIllnessRecord(IllnessRecordDTO illnessRecordDTO, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader);
 
     /**
      *Get a single record associated with a given ID
@@ -23,7 +24,7 @@ public interface IllnessRecordService {
      * @return a single recordDTO object if found in the database
      * @throws RecordNotFoundException if record is not found in the database
      */
-    IllnessRecordDTO getIllnessRecord(Long id) throws RecordNotFoundException;
+    ResponseEntity<IllnessRecordDTO> getIllnessRecord(Long id) throws RecordNotFoundException;
 
     /**
      *Retrieves all Illness records that are associated with a userID
@@ -32,7 +33,7 @@ public interface IllnessRecordService {
      * @return a list of recordDTO object if found in the database
      * @throws RecordNotFoundException if record is not found in the database
      */
-   List<IllnessRecordDTO> getAllIllnessRecordsByUserId(Long userId) throws RecordNotFoundException;
+    ResponseEntity<List<IllnessRecordDTO>> getAllIllnessRecordsByUserId(Long userId) throws RecordNotFoundException;
 
     /**
      *Retrieves all Illness records that can match to the search term(contains)
@@ -42,7 +43,7 @@ public interface IllnessRecordService {
      * @return a list of recordDTO object if found in the database
      * @throws RecordNotFoundException if record is not found in the database
      */
-    List<IllnessRecordDTO> getRecordsBySearch(String term, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) throws RecordNotFoundException;
+    ResponseEntity<List<IllnessRecordDTO>> getRecordsBySearch(String term, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) throws RecordNotFoundException;
 
     /**
      *updates illness record found in the database associated with the logged-in user
@@ -52,7 +53,7 @@ public interface IllnessRecordService {
      * @return IllnessDTO object with updated user information
      * @throws RecordNotFoundException if record doesn't match any existing record
      */
-    IllnessRecordDTO update(IllnessRecordDTO illnessRecordDTO, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) throws RecordNotFoundException;
+    ResponseEntity<IllnessRecordDTO> update(IllnessRecordDTO illnessRecordDTO, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) throws RecordNotFoundException;
 
     /**
      * Deletes the record associated with the id in the database and logged-in user
@@ -62,7 +63,7 @@ public interface IllnessRecordService {
      * @return true if successful and false if not
      * @throws RecordNotFoundException if no record is found matching the recordID and userID
      */
-    Boolean deleteIllnessRecord(Long id, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) throws RecordNotFoundException;
+    ResponseEntity<Boolean> deleteIllnessRecord(Long id, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) throws RecordNotFoundException;
 
     /**
      *Retrieves all Illness records that are associated with a logged-in user
@@ -71,5 +72,5 @@ public interface IllnessRecordService {
      * @return a list of recordDTO object if found in the database matching the logged-in user
      * @throws RecordNotFoundException if record is not found in the database
      */
-    List<IllnessRecordDTO> getAllIllnessRecordsByLoggedInUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) throws RecordNotFoundException;
+    ResponseEntity<List<IllnessRecordDTO>> getAllIllnessRecordsByLoggedInUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) throws RecordNotFoundException;
 }
